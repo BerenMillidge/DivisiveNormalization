@@ -90,7 +90,7 @@ class PCModel(object):
 
         for itr in range(n_iters):
             for l in range(1, self.n_layers):
-                delta = self.layers[l].backward(self.errs[l + 1]) - self.errs[l]
+                delta = self.pe_fn(self.layers[l].backward(self.errs[l + 1]) , self.errs[l])
                 self.mus[l] = self.mus[l] + self.mu_dt * delta
 
             for n in range(1, self.n_nodes):
@@ -107,7 +107,7 @@ class PCModel(object):
             delta = self.layers[0].backward(self.errs[1])
             self.mus[0] = self.mus[0] + self.mu_dt * delta
             for l in range(1, self.n_layers):
-                delta = self.layers[l].backward(self.errs[l + 1]) - self.errs[l]
+                delta = self.pe_fn(self.layers[l].backward(self.errs[l + 1]) , self.errs[l])
                 self.mus[l] = self.mus[l] + self.mu_dt * delta
 
             for n in range(1, self.n_nodes):

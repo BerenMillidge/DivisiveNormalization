@@ -19,6 +19,12 @@ def divide(x,y):
 def divide_reverse(x,y):
     return torch.div(y,x)
 
+def multiply(x,y):
+    return x * y
+
+def add(x,y):
+    return x + y
+
 ###
 
 def main(cf):
@@ -112,7 +118,7 @@ if __name__ == "__main__":
         # inference params
         cf.mu_dt = 0.01
         cf.n_train_iters = 50
-        cf.fixed_preds_train = True
+        cf.fixed_preds_train = False
 
         # model params
         cf.use_bias = True

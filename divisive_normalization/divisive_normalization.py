@@ -16,11 +16,20 @@ def subtract(x,y):
 def divide(x,y):
     return torch.div(x,y)
 
+def safe_divide(x,y,eps=1e-8):
+    return torch.div(x, y+eps)
+
 def divide_reverse(x,y):
     return torch.div(y,x)
 
+def save_divide_reverse(x,y,eps=1e-8):
+    return torch.div(y,x+eps)
+
 def multiply(x,y):
     return x * y
+
+def safe_multiply(x,y,eps=1e-8):
+    return max(x,eps) * max(y,eps)
 
 def add(x,y):
     return x + y
@@ -50,7 +59,8 @@ def main(cf):
         act_fn=cf.act_fn,
         use_bias=cf.use_bias,
         kaiming_init=cf.kaiming_init,
-        pe_fn = cf.pe_fn
+        pe_fn = cf.pe_fn,
+        pe_fn_inverse = cf.pe_fn_inverse
     )
     optimizer = optim.get_optim(
         model.params,
@@ -125,6 +135,7 @@ if __name__ == "__main__":
         cf.kaiming_init = False
         cf.nodes = [784, 300, 100, 10]
         cf.act_fn = utils.ReLU()
-        cf.pe_fn = divide
+        cf.pe_fn = safe_divide
+        cf.pe_fn_inverse = multiply
 
         main(cf)

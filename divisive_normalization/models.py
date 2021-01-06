@@ -7,15 +7,20 @@ from layers import FCLayer
 def minus(x,y):
     return x-y
 
+def add(x,y):
+    return x + y
+
 
 class PCModel(object):
-    def __init__(self, nodes, mu_dt, act_fn, use_bias=False, kaiming_init=False,pe_fn=minus):
+    def __init__(self, nodes, mu_dt, act_fn, use_bias=False, kaiming_init=False,pe_fn=minus,pe_fn_inverse = add):
         self.nodes = nodes
         self.mu_dt = mu_dt
 
         self.n_nodes = len(nodes)
         self.n_layers = len(nodes) - 1
         self.pe_fn = pe_fn
+        self.pe_fn_inverse = pe_fn_inverse
+        self.eps = 1e-6
 
         self.layers = []
         for l in range(self.n_layers):
@@ -90,8 +95,9 @@ class PCModel(object):
 
         for itr in range(n_iters):
             for l in range(1, self.n_layers):
-                delta = self.pe_fn(self.layers[l].backward(self.errs[l + 1]) , self.errs[l])
-                self.mus[l] = self.mus[l] + self.mu_dt * delta
+                delta = self.pe_fn_inverse(self.layers[l].backward(self.errs[l + 1]) , self.errs[l])
+                self.mus[l] = self.mus[l] + self.mu_dt * delta + self.eps
+                print(self.mus[l])
 
             for n in range(1, self.n_nodes):
                 if not fixed_preds:
@@ -107,8 +113,8 @@ class PCModel(object):
             delta = self.layers[0].backward(self.errs[1])
             self.mus[0] = self.mus[0] + self.mu_dt * delta
             for l in range(1, self.n_layers):
-                delta = self.pe_fn(self.layers[l].backward(self.errs[l + 1]) , self.errs[l])
-                self.mus[l] = self.mus[l] + self.mu_dt * delta
+                delta = self.pe_fn_inverse(self.layers[l].backward(self.errs[l + 1]) , self.errs[l])
+                self.mus[l] = self.mus[l] + self.mu_dt * delta + self.eps
 
             for n in range(1, self.n_nodes):
                 if not fixed_preds:
